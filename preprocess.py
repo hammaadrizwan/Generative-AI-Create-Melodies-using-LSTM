@@ -24,11 +24,7 @@ ACCEPTABLE_DURATIONS = [
 
 
 def load_songs_in_kern(dataset_path):
-    """Loads all kern pieces in dataset using music21.
 
-    :param dataset_path (str): Path to dataset
-    :return songs (list of m21 streams): List containing all pieces
-    """
     songs = []
 
     # go through all the files in dataset and load them with music21
@@ -43,12 +39,7 @@ def load_songs_in_kern(dataset_path):
 
 
 def has_acceptable_durations(song, acceptable_durations):
-    """Boolean routine that returns True if piece has all acceptable duration, False otherwise.
 
-    :param song (m21 stream):
-    :param acceptable_durations (list): List of acceptable duration in quarter length
-    :return (bool):
-    """
     for note in song.flat.notesAndRests:
         if note.duration.quarterLength not in acceptable_durations:
             return False
@@ -56,12 +47,6 @@ def has_acceptable_durations(song, acceptable_durations):
 
 
 def transpose(song):
-    """Transposes song to C maj/A min
-
-    :param piece (m21 stream): Piece to transpose
-    :return transposed_song (m21 stream):
-    """
-
     # get key from the song
     parts = song.getElementsByClass(m21.stream.Part)
     measures_part0 = parts[0].getElementsByClass(m21.stream.Measure)
@@ -83,16 +68,7 @@ def transpose(song):
 
 
 def encode_song(song, time_step=0.25):
-    """Converts a score into a time-series-like music representation. Each item in the encoded list represents 'min_duration'
-    quarter lengths. The symbols used at each step are: integers for MIDI notes, 'r' for representing a rest, and '_'
-    for representing notes/rests that are carried over into a new time step. Here's a sample encoding:
 
-        ["r", "_", "60", "_", "_", "_", "72" "_"]
-
-    :param song (m21 stream): Piece to encode
-    :param time_step (float): Duration of each time step in quarter length
-    :return:
-    """
 
     encoded_song = []
 
@@ -157,13 +133,7 @@ def load(file_path):
 
 
 def create_single_file_dataset(dataset_path, file_dataset_path, sequence_length):
-    """Generates a file collating all the encoded songs and adding new piece delimiters.
 
-    :param dataset_path (str): Path to folder containing the encoded songs
-    :param file_dataset_path (str): Path to file for saving songs in single file
-    :param sequence_length (int): # of time steps to be considered for training
-    :return songs (str): String containing all songs in dataset + delimiters
-    """
 
     new_song_delimiter = "/ " * sequence_length
     songs = ""
@@ -186,12 +156,7 @@ def create_single_file_dataset(dataset_path, file_dataset_path, sequence_length)
 
 
 def create_mapping(songs, mapping_path):
-    """Creates a json file that maps the symbols in the song dataset onto integers
 
-    :param songs (str): String with all songs
-    :param mapping_path (str): Path where to save mapping
-    :return:
-    """
     mappings = {}
 
     # identify the vocabulary
@@ -225,13 +190,6 @@ def convert_songs_to_int(songs):
 
 
 def generate_training_sequences(sequence_length):
-    """Create input and output data samples for training. Each sample is a sequence.
-
-    :param sequence_length (int): Length of each sequence. With a quantisation at 16th notes, 64 notes equates to 4 bars
-
-    :return inputs (ndarray): Training inputs
-    :return targets (ndarray): Training targets
-    """
 
     # load songs and map them to int
     songs = load(SINGLE_FILE_DATASET)
