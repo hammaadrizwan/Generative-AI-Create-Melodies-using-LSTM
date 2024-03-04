@@ -1,10 +1,10 @@
 import os
-import music21 as m21
 import json
-import tensorflow.keras as keras
+import music21 as m21
 import numpy as np
+import tensorflow.keras as keras
 
-KERN_DATASET_PATH = "deutschl/test"
+KERN_DATASET_PATH = "deutschl/erk"
 SAVE_DIR = "dataset"
 SINGLE_FILE_DATASET = "file_dataset"
 MAPPING_PATH = "mapping.json"
@@ -146,6 +146,9 @@ def preprocess(dataset_path):
         with open(save_path, "w") as fp:
             fp.write(encoded_song)
 
+        if i % 10 == 0:
+            print(f"Song {i} out of {len(songs)} processed")
+
 
 def load(file_path):
     with open(file_path, "r") as fp:
@@ -203,40 +206,62 @@ def create_mapping(songs, mapping_path):
     with open(mapping_path, "w") as fp:
         json.dump(mappings, fp, indent=4)
 
+
 def convert_songs_to_int(songs):
-    int_songs=[]
+    int_songs = []
+
+    # load mappings
     with open(MAPPING_PATH, "r") as fp:
-        mappings=json.load(fp)
-        songs=songs.split()
+        mappings = json.load(fp)
 
-        for symbol in songs:
-            int_songs.append(mappings[symbol])
+    # transform songs string to list
+    songs = songs.split()
 
-        return int_songs
-    
+    # map songs to int
+    for symbol in songs:
+        int_songs.append(mappings[symbol])
+
+    return int_songs
+
+
 def generate_training_sequences(sequence_length):
-    songs=load(SINGLE_FILE_DATASET)
-    int_songs=convert_songs_to_int(songs)
-    num_sequences=len(int_songs)-sequence_length
-    
-    inputs=[]
-    targets=[]
+    """Create input and output data samples for training. Each sample is a sequence.
+
+    :param sequence_length (int): Length of each sequence. With a quantisation at 16th notes, 64 notes equates to 4 bars
+
+    :return inputs (ndarray): Training inputs
+    :return targets (ndarray): Training targets
+    """
+
+    # load songs and map them to int
+    songs = load(SINGLE_FILE_DATASET)
+    int_songs = convert_songs_to_int(songs)
+
+    inputs = []
+    targets = []
+
+    # generate the training sequences
+    num_sequences = len(int_songs) - sequence_length
     for i in range(num_sequences):
         inputs.append(int_songs[i:i+sequence_length])
         targets.append(int_songs[i+sequence_length])
 
-    vocabulary_size=len(set(int_songs))
-    inputs=keras.utils.to_categorical(inputs,num_classes=vocabulary_size)
-    target=np.array(targets)
+    # one-hot encode the sequences
+    vocabulary_size = len(set(int_songs))
+    # inputs size: (# of sequences, sequence length, vocabulary size)
+    inputs = keras.utils.to_categorical(inputs, num_classes=vocabulary_size)
+    targets = np.array(targets)
 
-    return inputs,targets
+    print(f"There are {len(inputs)} sequences.")
+
+    return inputs, targets
 
 
 def main():
     preprocess(KERN_DATASET_PATH)
     songs = create_single_file_dataset(SAVE_DIR, SINGLE_FILE_DATASET, SEQUENCE_LENGTH)
     create_mapping(songs, MAPPING_PATH)
-    inputs, targets = generate_training_sequences(SEQUENCE_LENGTH)
+    #inputs, targets = generate_training_sequences(SEQUENCE_LENGTH)
 
 
 if __name__ == "__main__":
