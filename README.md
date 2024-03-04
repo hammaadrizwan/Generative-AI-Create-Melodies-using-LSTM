@@ -1,7 +1,7 @@
-# HarmonAI: Creating Melodies with RNN and LSTM
+# Generative AI to create melodies using LSTM
 
 ## Overview
-HarmonAI is a project that utilizes Recurrent Neural Networks (RNN) and Long Short-Term Memory (LSTM) networks to generate original melodies. This project explores the capabilities of deep learning models in the field of music composition, enabling the creation of unique and harmonious musical pieces.
+HarmonAI is a supervised Learning project that utilizes Recurrent Neural Networks (RNN) and Long Short-Term Memory (LSTM) networks to generate original melodies. This project explores the capabilities of deep learning models in the field of music composition, enabling the creation of unique and harmonious musical pieces.
 
 ## Features
 - **RNN and LSTM Networks**: Utilizes both RNN and LSTM architectures for melody generation, leveraging their ability to capture sequential patterns in music.
